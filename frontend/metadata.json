@@ -1,0 +1,5 @@
+{
+  "name": "Gua CR Frontend",
+  "description": "Static frontend for cr.gua.cx container registry mirror documentation.",
+  "version": "0.1.0"
+}
