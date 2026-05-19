@@ -9,6 +9,39 @@
 
 这个仓库的目标不是重新实现一个 registry proxy，而是把 crproxy、nginx 前门、静态文档页和常见部署方式整理成一套可复用项目。
 
+## 公开可用地址
+
+当前已部署一组公开可用的 GUA Hub 镜像加速入口：
+
+```text
+文档首页：      https://cr.gua.cx/
+多源镜像入口：  cr.gua.cx
+Docker Hub 镜像：dhub.gua.cx
+状态页面：      https://cr.gua.cx/status
+```
+
+可直接使用以下命令测试：
+
+```bash
+# 多源 path-style 入口
+docker pull cr.gua.cx/docker.io/library/nginx:latest
+docker pull cr.gua.cx/ghcr.io/owner/image:tag
+docker pull cr.gua.cx/quay.io/org/image:tag
+
+# Docker Hub 专用入口
+docker pull dhub.gua.cx/library/nginx:latest
+```
+
+Docker daemon 可将 Docker Hub mirror 配置为：
+
+```json
+{
+  "registry-mirrors": ["https://dhub.gua.cx"]
+}
+```
+
+注意：这是公开自用/共享服务，适合公开镜像加速、临时拉取和低频使用；不建议作为私有镜像、敏感镜像或生产强依赖的唯一上游。
+
 ## 项目结构
 
 ```text
@@ -163,27 +196,31 @@ deploy/nginx/README.md
 
 ## 使用示例
 
+如果只是想直接使用当前公开服务，可以使用 GUA Hub 地址：
+
 多源 path-style 入口：
 
 ```bash
-docker pull cr.example.com/docker.io/library/nginx:latest
-docker pull cr.example.com/ghcr.io/owner/image:tag
-docker pull cr.example.com/quay.io/org/image:tag
+docker pull cr.gua.cx/docker.io/library/nginx:latest
+docker pull cr.gua.cx/ghcr.io/owner/image:tag
+docker pull cr.gua.cx/quay.io/org/image:tag
 ```
 
 Docker Hub 专用 mirror 入口：
 
 ```bash
-docker pull dhub.example.com/library/nginx:latest
+docker pull dhub.gua.cx/library/nginx:latest
 ```
 
 Docker daemon mirror 配置：
 
 ```json
 {
-  "registry-mirrors": ["https://dhub.example.com"]
+  "registry-mirrors": ["https://dhub.gua.cx"]
 }
 ```
+
+如果是自部署，把上面的 `cr.gua.cx` / `dhub.gua.cx` 替换成自己的域名即可。
 
 注意：不要直接覆盖已有的 `/etc/docker/daemon.json`，应手动合并配置。
 
