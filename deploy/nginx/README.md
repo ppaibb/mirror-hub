@@ -1,13 +1,19 @@
-# nginx reverse proxy example
+# nginx 反向代理示例
 
-This example keeps nginx on public `80/443` and routes `/v2/` to crproxy before serving the static frontend.
+这个示例使用系统级 nginx 作为公网入口：
 
-Replace:
+- `cr.example.com/` 服务静态前端
+- `cr.example.com/v2/` 反代到多源 crproxy
+- `dhub.example.com/v2/` 反代到 Docker Hub mirror crproxy
+- `dhub.example.com/` 跳转到 `cr.example.com/`
 
-- `cr.example.com` with your multi-registry domain
-- `dhub.example.com` with your Docker Hub mirror domain
-- certificate paths with your own Let's Encrypt paths
-- backend ports if your crproxy containers use different bindings
+请按实际情况替换：
+
+- `cr.example.com`
+- `dhub.example.com`
+- TLS 证书路径
+- crproxy 后端端口
+- 静态前端目录
 
 ```nginx
 upstream crproxy_path_backend {
@@ -31,7 +37,7 @@ server {
     ssl_certificate /etc/letsencrypt/live/cr.example.com/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/cr.example.com/privkey.pem;
 
-    # Registry API must be routed before static frontend.
+    # Registry API 必须优先匹配，不能被静态前端吞掉。
     location /v2/ {
         proxy_pass http://crproxy_path_backend;
         proxy_http_version 1.1;
@@ -76,3 +82,23 @@ server {
     }
 }
 ```
+
+## 多后端示例
+
+如果有多台 crproxy 后端，可以加 upstream：
+
+```nginx
+upstream crproxy_path_backend {
+    ip_hash;
+    server 127.0.0.1:18080;
+    server 10.0.0.91:18080;
+}
+```
+
+可配合：
+
+```nginx
+proxy_next_upstream error timeout http_502 http_503 http_504;
+```
+
+实现简单故障转移。严格高可用建议使用带健康检查的负载均衡。
