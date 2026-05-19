@@ -58,13 +58,30 @@
           const ms = Math.round(performance.now() - start);
           const div = document.createElement('div');
           div.className = 'item';
-          div.innerHTML = `
-            <strong>${check.name}</strong><br />
-            目标：<code>${check.url}</code><br />
-            结果：<span class="${ok ? 'ok' : 'bad'}">${ok ? '正常' : '异常'}</span><br />
-            HTTP: <code>${status || 'N/A'}</code>，耗时：<code>${ms} ms</code><br />
-            详情：<code>${detail || '-'}</code>
-          `;
+          const title = document.createElement('strong');
+          title.textContent = check.name;
+
+          const target = document.createElement('p');
+          target.textContent = `目标：${check.url}`;
+
+          const result = document.createElement('p');
+          const resultText = document.createElement('span');
+          resultText.className = ok ? 'ok' : 'bad';
+          resultText.textContent = ok ? '正常' : '异常';
+          result.textContent = '结果：';
+          result.appendChild(resultText);
+
+          const metrics = document.createElement('p');
+          metrics.textContent = `HTTP: ${status || 'N/A'}，耗时：${ms} ms`;
+
+          const detailLine = document.createElement('p');
+          detailLine.textContent = `详情：${detail || '-'}`;
+
+          div.appendChild(title);
+          div.appendChild(target);
+          div.appendChild(result);
+          div.appendChild(metrics);
+          div.appendChild(detailLine);
           root.appendChild(div);
         }
       }
