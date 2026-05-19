@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mirror Hub</title>
+    <style>
+      body { font-family: Arial, sans-serif; margin: 2rem auto; max-width: 960px; line-height: 1.6; color: #1f2937; padding: 0 1rem; }
+      h1, h2 { color: #111827; }
+      code, pre { background: #f3f4f6; border-radius: 6px; }
+      pre { padding: 0.9rem; overflow: auto; }
+      a { color: #2563eb; }
+      .box { border: 1px solid #e5e7eb; border-radius: 8px; padding: 1rem 1.2rem; margin-bottom: 1rem; }
+    </style>
+  </head>
+  <body>
+    <h1>Mirror Hub（crproxy）</h1>
+    <p>自托管容器镜像加速入口，聚合 Docker Hub / GHCR / Quay.io 等多源镜像。</p>
+
+    <div class="box">
+      <h2>快速启动</h2>
+      <pre>docker compose up -d</pre>
+      <p>
+        启动后：<br />
+        - 镜像代理：<code>http://&lt;your-host&gt;:5000</code><br />
+        - 文档与状态页：<code>http://&lt;your-host&gt;:8080</code>
+      </p>
+      <p><a href="/status.html">查看服务状态页</a></p>
+    </div>
+
+    <div class="box">
+      <h2>多源镜像代理配置</h2>
+      <p>默认映射定义在 <code>config/registrymap.json</code>：</p>
+      <pre>{
+  "default": "https://registry-1.docker.io",
+  "docker": "https://registry-1.docker.io",
+  "ghcr": "https://ghcr.io",
+  "quay": "https://quay.io"
+}</pre>
+    </div>
+
+    <div class="box">
+      <h2>Docker 使用示例</h2>
+      <pre>{
+  "registry-mirrors": ["http://&lt;your-host&gt;:5000"],
+  "insecure-registries": ["&lt;your-host&gt;:5000"]
+}</pre>
+      <p>配置文件：<code>/etc/docker/daemon.json</code>，修改后重启 Docker。</p>
+    </div>
+
+    <div class="box">
+      <h2>containerd 使用示例</h2>
+      <p>在 <code>/etc/containerd/certs.d/docker.io/hosts.toml</code> 中配置：</p>
+      <pre>server = "https://registry-1.docker.io"
+
+[host."http://&lt;your-host&gt;:5000"]
+  capabilities = ["pull", "resolve"]
+  skip_verify = true</pre>
+      <p>修改后执行 <code>systemctl restart containerd</code>。</p>
+    </div>
+  </body>
+</html>

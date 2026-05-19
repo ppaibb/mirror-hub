@@ -1,0 +1,6 @@
+{
+  "default": "https://registry-1.docker.io",
+  "docker": "https://registry-1.docker.io",
+  "ghcr": "https://ghcr.io",
+  "quay": "https://quay.io"
+}

@@ -1,0 +1,30 @@
+services:
+  crproxy:
+    image: cleverest/crproxy@sha256:5f16f699522e0598c57b6c4ba90be22f4743179e527dcc50c2651ac8ba110fe8
+    container_name: crproxy
+    restart: unless-stopped
+    command:
+      - -listen=:5000
+      - -registry-map=/etc/crproxy/registrymap.json
+      - -cache-dir=/var/lib/crproxy/cache
+      - -log-level=info
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./config/registrymap.json:/etc/crproxy/registrymap.json:ro
+      - crproxy-cache:/var/lib/crproxy/cache
+
+  web:
+    image: nginx@sha256:dc48b7a872a79fb541ba5081d320b11b549231bc63ba465a7495afaa7d2ebcb8
+    container_name: mirror-hub-web
+    restart: unless-stopped
+    depends_on:
+      - crproxy
+    ports:
+      - "8080:80"
+    volumes:
+      - ./web:/usr/share/nginx/html:ro
+      - ./web/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+
+volumes:
+  crproxy-cache:

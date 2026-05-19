@@ -1,109 +1,67 @@
 # mirror-hub
 
-Self-hosted container registry mirror hub powered by [DaoCloud crproxy](https://github.com/DaoCloud/crproxy), with a modern static frontend, usage docs, and a service-status page.
+基于 `crproxy` 的自托管容器镜像加速服务，包含：
 
-`mirror-hub` 是一个可自托管的容器镜像加速入口方案：底层使用 crproxy 代理 Docker Hub、GHCR、Quay.io 等镜像源，前端提供镜像地址转换、Docker/containerd 配置说明、服务状态展示和使用边界说明。
+- 多源镜像代理（Docker Hub / GHCR / Quay.io）
+- Docker / containerd 使用文档
+- 静态前端说明页
+- 服务状态页
 
-## Features
+## 目录结构
 
-- Multi-registry path proxy, e.g. `cr.example.com/docker.io/library/nginx:latest`
-- Docker Hub mirror endpoint, e.g. `dhub.example.com/library/nginx:latest`
-- Modern static frontend built with Next.js static export
-- Image address converter for common registries
-- Docker daemon and containerd configuration docs
-- Optional UptimeRobot-based status page
-- Shared front-door nginx layout: keep system nginx on `80/443`, bind crproxy backends to loopback/private ports
+- `/docker-compose.yml`：一键启动 `crproxy + nginx`。
+- `/config/registrymap.json`：多源镜像映射配置。
+- `/web/index.html`：前端文档页。
+- `/web/status.html`：服务状态页（探测 `/api/healthz`、`/api/help`）。
 
-## Recommended architecture
-
-```text
-Internet
-  |
-  |  HTTPS 443
-  v
-system nginx / caddy
-  |-- cr.example.com/       -> static frontend
-  |-- cr.example.com/v2/    -> crproxy path backend, e.g. 127.0.0.1:18080
-  |-- dhub.example.com/     -> redirect to frontend docs
-  `-- dhub.example.com/v2/  -> crproxy Docker Hub backend, e.g. 127.0.0.1:18081
-```
-
-The live GUA Hub deployment uses this pattern so application containers do not occupy public `80/443` directly.
-
-## Repository layout
-
-```text
-frontend/        Next.js static frontend
-部署/nginx?      See deploy/nginx for reverse-proxy examples
-deploy/crproxy/  crproxy compose examples and notes
-docs/            operational docs
-scripts/         helper scripts
-```
-
-## Quick start: frontend
+## 快速开始
 
 ```bash
-cd frontend
-npm install
-npm run build
+docker compose up -d
 ```
 
-The static output is generated into:
+启动后访问：
 
-```text
-frontend/out/
-```
+- 镜像代理入口：`http://<host>:5000`
+- 文档首页：`http://<host>:8080`
+- 状态页：`http://<host>:8080/status.html`
 
-Deploy `frontend/out/` to your web root, for example:
+## 多源镜像映射
 
-```bash
-rsync -a frontend/out/ root@example.com:/opt/mirror-hub-frontend/current/
-```
-
-## Environment variables
-
-Frontend status page can optionally call UptimeRobot directly from the browser:
-
-```bash
-NEXT_PUBLIC_UPTIME_ROBOT_API_KEYS=key1,key2
-```
-
-This value is exposed in the static JavaScript bundle. For public production sites, prefer generating a static `status.json` server-side and letting the frontend read it, to avoid API-key exposure, CORS issues, and rate limits.
-
-## Image usage examples
-
-Path-style multi-registry entry:
-
-```bash
-docker pull cr.example.com/docker.io/library/nginx:latest
-docker pull cr.example.com/ghcr.io/owner/image:tag
-docker pull cr.example.com/quay.io/org/image:tag
-```
-
-Docker Hub-only mirror endpoint:
-
-```bash
-docker pull dhub.example.com/library/nginx:latest
-```
-
-Docker daemon mirror:
+`config/registrymap.json` 默认配置：
 
 ```json
 {
-  "registry-mirrors": ["https://dhub.example.com"]
+  "default": "https://registry-1.docker.io",
+  "docker": "https://registry-1.docker.io",
+  "ghcr": "https://ghcr.io",
+  "quay": "https://quay.io"
 }
 ```
 
-Do not overwrite an existing `/etc/docker/daemon.json`; merge the `registry-mirrors` field manually.
+## Docker 配置示例
 
-## Security and operation notes
+编辑 `/etc/docker/daemon.json`：
 
-- Do not expose crproxy backend containers directly unless you understand the risk.
-- Put nginx/caddy in front for TLS, routing, logging, and rate limits.
-- For public service, add access control or rate limiting if abuse becomes possible.
-- Do not commit real UptimeRobot keys, Cloudflare tokens, Docker credentials, or registry credentials.
-- crproxy is an upstream project; this repository packages an opinionated deployment and frontend around it.
+```json
+{
+  "registry-mirrors": ["http://<host>:5000"],
+  "insecure-registries": ["<host>:5000"]
+}
+```
 
-## License
+然后重启 Docker。
 
-MIT, unless otherwise specified by upstream dependencies.
+## containerd 配置示例
+
+编辑 `/etc/containerd/certs.d/docker.io/hosts.toml`：
+
+```toml
+server = "https://registry-1.docker.io"
+
+[host."http://<host>:5000"]
+  capabilities = ["pull", "resolve"]
+  skip_verify = true
+```
+
+然后重启 containerd。
