@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import Link from 'next/link';
 import { Copy, Check, Box, Activity, ShieldCheck, Terminal, RefreshCw, AlertTriangle, Clock3, Wifi, FileText } from 'lucide-react';
 
 const UPTIME_ROBOT_API_KEYS = (process.env.NEXT_PUBLIC_UPTIME_ROBOT_API_KEYS || '')
@@ -77,6 +78,23 @@ const formatDuration = (seconds?: number) => {
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState<'docs' | 'status'>('docs');
+
+  useEffect(() => {
+    const syncPath = () => {
+      setActiveTab(window.location.pathname === '/status' ? 'status' : 'docs');
+    };
+    syncPath();
+    window.addEventListener('popstate', syncPath);
+    return () => window.removeEventListener('popstate', syncPath);
+  }, []);
+
+  const navigateTab = (tab: 'docs' | 'status') => {
+    setActiveTab(tab);
+    const path = tab === 'status' ? '/status' : '/';
+    if (window.location.pathname !== path) {
+      window.history.pushState({}, '', path);
+    }
+  };
   const [input, setInput] = useState('nginx:latest');
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
   const [configTab, setConfigTab] = useState<'docker' | 'containerd'>('docker');
@@ -248,28 +266,30 @@ sudo systemctl restart containerd`;
     <div className="w-full h-screen overflow-hidden flex flex-col bg-[#F8FAFC] text-slate-900">
       {/* Header */}
       <header className="h-16 shrink-0 border-b border-slate-200/70 bg-white/80 backdrop-blur-md px-4 md:px-8 lg:px-10 flex items-center justify-between gap-4 shadow-sm shadow-slate-200/30">
-        <div className="flex items-center gap-3 cursor-pointer shrink-0" onClick={() => setActiveTab('docs')}>
+        <Link href="/" className="flex items-center gap-3 shrink-0" onClick={(event) => { event.preventDefault(); navigateTab('docs'); }}>
           <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/20">
             <Box className="w-6 h-6 text-white" />
           </div>
           <span className="font-bold text-lg md:text-xl tracking-tight text-slate-800">GUA Hub 镜像加速节点</span>
-        </div>
-        <nav className="flex w-auto bg-white/70 border border-slate-200/70 rounded-2xl p-1 text-sm font-semibold text-slate-500 shadow-inner shadow-slate-200/40 backdrop-blur">
+        </Link>
+        <nav className="flex items-center gap-5 md:gap-7 text-sm font-semibold text-slate-500">
           {[
-            { key: 'docs' as const, label: '使用文档', icon: FileText },
-            { key: 'status' as const, label: '服务状态', icon: Activity },
+            { key: 'docs' as const, label: '使用文档', href: '/', icon: FileText },
+            { key: 'status' as const, label: '服务状态', href: '/status', icon: Activity },
           ].map((item) => {
             const Icon = item.icon;
             const isActive = activeTab === item.key;
             return (
-              <button
+              <Link
                 key={item.key}
-                onClick={() => setActiveTab(item.key)}
-                className={`relative flex-none inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2 transition-all duration-300 ease-out ${isActive ? 'bg-white text-blue-600 shadow-md shadow-slate-200/60 scale-[1.01]' : 'hover:text-slate-800 hover:bg-white/70'}`}
+                href={item.href}
+                onClick={(event) => { event.preventDefault(); navigateTab(item.key); }}
+                className={`relative inline-flex items-center gap-1.5 py-2 transition-colors duration-200 ${isActive ? 'text-blue-600' : 'hover:text-slate-900'}`}
               >
                 <Icon className="w-4 h-4" />
-                {item.label}
-              </button>
+                <span>{item.label}</span>
+                {isActive && <span className="absolute left-0 right-0 -bottom-1 h-0.5 rounded-full bg-blue-600" />}
+              </Link>
             );
           })}
         </nav>
