@@ -1,0 +1,30 @@
+services:
+  crproxy:
+    image: fimreal/crproxy:latest
+    container_name: crproxy
+    restart: unless-stopped
+    command:
+      - -listen=:5000
+      - -registry-map=/etc/crproxy/registrymap.json
+      - -cache-dir=/var/lib/crproxy/cache
+      - -log-level=info
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./config/registrymap.json:/etc/crproxy/registrymap.json:ro
+      - crproxy-cache:/var/lib/crproxy/cache
+
+  web:
+    image: nginx:alpine
+    container_name: mirror-hub-web
+    restart: unless-stopped
+    depends_on:
+      - crproxy
+    ports:
+      - "8080:80"
+    volumes:
+      - ./web:/usr/share/nginx/html:ro
+      - ./web/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+
+volumes:
+  crproxy-cache:
