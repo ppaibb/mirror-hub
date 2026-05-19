@@ -443,62 +443,74 @@ sudo systemctl restart containerd`;
         </div>
       </main>
       ) : (
-      <main className="flex-1 overflow-y-auto w-full max-w-5xl mx-auto p-4 md:p-6 flex flex-col gap-5 lg:gap-6">
-        <section className="bg-white border border-slate-200 rounded-2xl p-6 md:p-7 shadow-sm transition-all duration-300 hover:shadow-md">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div className="flex items-start gap-4">
-              <div className="bg-blue-600 p-3 rounded-xl shrink-0 text-white">
-                <Activity className="w-7 h-7" />
+      <main className="h-full min-h-0 overflow-y-auto w-full max-w-[1440px] mx-auto p-4 md:p-5 grid grid-cols-1 xl:grid-cols-[340px_minmax(0,1fr)] gap-5">
+        <aside className="flex flex-col gap-4 xl:sticky xl:top-0 xl:self-start">
+          <section className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm transition-all duration-300 hover:shadow-md">
+            <div className="flex items-start gap-3">
+              <div className="bg-blue-600 p-2.5 rounded-xl shrink-0 text-white">
+                <Activity className="w-5 h-5" />
               </div>
-              <div>
-                <h1 className="text-2xl font-bold text-slate-900">服务状态</h1>
-                <p className="text-slate-500 mt-1">数据来自 UptimeRobot Monitor-Specific API，页面直连读取公开监控状态。</p>
-                <p className="text-xs text-slate-400 mt-2">{lastUpdated ? `最后更新：${lastUpdated}` : '点击刷新获取最新状态'}</p>
+              <div className="min-w-0 flex-1">
+                <h1 className="text-xl font-bold text-slate-900">服务状态</h1>
+                <p className="text-xs text-slate-500 mt-1 leading-relaxed">实时读取 UptimeRobot 公开监控状态。</p>
+                <p className="text-[11px] text-slate-400 mt-2">{lastUpdated ? `最后更新：${lastUpdated}` : '点击刷新获取最新状态'}</p>
               </div>
             </div>
             <button
               onClick={loadUptimeStatus}
               disabled={statusLoading}
-              className="inline-flex items-center justify-center gap-2 bg-slate-900 hover:bg-slate-800 disabled:opacity-50 text-white rounded-lg px-4 py-2 text-sm font-medium transition-colors w-fit"
+              className="mt-4 w-full inline-flex items-center justify-center gap-2 bg-slate-900 hover:bg-slate-800 disabled:opacity-50 text-white rounded-xl px-4 py-2 text-sm font-medium transition-colors"
             >
               <RefreshCw className={`w-4 h-4 ${statusLoading ? 'animate-spin' : ''}`} />
               {statusLoading ? '刷新中' : '刷新状态'}
             </button>
-          </div>
-        </section>
+          </section>
 
-        {statusError && (
-          <div className="bg-red-50 border border-red-100 text-red-700 rounded-xl p-4 flex items-start gap-3 text-sm">
-            <AlertTriangle className="w-5 h-5 shrink-0 mt-0.5" />
-            <div>
-              <div className="font-semibold">状态获取失败</div>
-              <div className="text-red-600 mt-1">{statusError}</div>
-            </div>
-          </div>
-        )}
-
-        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {[
-            { label: '监控项', value: statusSummary.total || '-', icon: ShieldCheck, color: 'text-blue-600 bg-blue-50' },
-            { label: '在线', value: statusSummary.online, icon: Wifi, color: 'text-emerald-600 bg-emerald-50' },
-            { label: '异常', value: statusSummary.offline, icon: AlertTriangle, color: statusSummary.offline ? 'text-red-600 bg-red-50' : 'text-slate-500 bg-slate-50' },
-            { label: '平均响应', value: statusSummary.avgResponse ? `${statusSummary.avgResponse} ms` : '-', icon: Clock3, color: 'text-violet-600 bg-violet-50' },
-          ].map((item, idx) => {
-            const Icon = item.icon;
-            return (
-              <div key={idx} className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm transition-all duration-300 hover:shadow-md">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold uppercase tracking-widest text-slate-400">{item.label}</span>
-                  <span className={`p-2 rounded-lg ${item.color}`}><Icon className="w-4 h-4" /></span>
-                </div>
-                <div className="text-2xl font-extrabold text-slate-900 mt-4">{item.value}</div>
+          {statusError && (
+            <div className="bg-red-50 border border-red-100 text-red-700 rounded-xl p-3 flex items-start gap-2 text-xs">
+              <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
+              <div>
+                <div className="font-semibold">状态获取失败</div>
+                <div className="text-red-600 mt-1 break-all">{statusError}</div>
               </div>
-            );
-          })}
-        </section>
+            </div>
+          )}
 
-        <section className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm transition-all duration-300 hover:shadow-md">
-          <div className="px-8 py-5 border-b border-slate-100 bg-slate-50 flex items-center justify-between gap-3">
+          <section className="grid grid-cols-2 gap-3">
+            {[
+              { label: '监控项', value: statusSummary.total || '-', icon: ShieldCheck, color: 'text-blue-600 bg-blue-50' },
+              { label: '在线', value: statusSummary.online, icon: Wifi, color: 'text-emerald-600 bg-emerald-50' },
+              { label: '异常', value: statusSummary.offline, icon: AlertTriangle, color: statusSummary.offline ? 'text-red-600 bg-red-50' : 'text-slate-500 bg-slate-50' },
+              { label: '平均响应', value: statusSummary.avgResponse ? `${statusSummary.avgResponse} ms` : '-', icon: Clock3, color: 'text-violet-600 bg-violet-50' },
+            ].map((item, idx) => {
+              const Icon = item.icon;
+              return (
+                <div key={idx} className="bg-white border border-slate-200 rounded-2xl p-3 shadow-sm transition-all duration-300 hover:shadow-md">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">{item.label}</span>
+                    <span className={`p-1.5 rounded-lg ${item.color}`}><Icon className="w-3.5 h-3.5" /></span>
+                  </div>
+                  <div className="text-xl font-extrabold text-slate-900 mt-2">{item.value}</div>
+                </div>
+              );
+            })}
+          </section>
+
+          <section className="bg-slate-900 rounded-2xl p-4 text-slate-300 shadow-xl border border-slate-800">
+            <h2 className="text-xs font-bold text-white uppercase tracking-widest mb-3 flex items-center gap-2">
+              <Terminal className="w-4 h-4" />
+              验证命令
+            </h2>
+            <pre className="bg-slate-950 px-4 py-3 rounded-xl border border-slate-800 font-mono text-xs leading-relaxed text-blue-300 overflow-x-auto whitespace-pre-wrap break-all">{`curl -I https://cr.gua.cx/v2/
+curl -I https://dhub.gua.cx/v2/
+docker pull cr.gua.cx/docker.io/library/busybox:latest
+docker pull dhub.gua.cx/library/busybox:latest`}</pre>
+            <p className="text-[11px] text-slate-500 mt-3 leading-relaxed">/v2/ 会优先反代到 crproxy，首页仍由静态前端提供。</p>
+          </section>
+        </aside>
+
+        <section className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm transition-all duration-300 hover:shadow-md min-w-0">
+          <div className="px-5 md:px-6 py-4 border-b border-slate-100 bg-slate-50 flex items-center justify-between gap-3">
             <h2 className="font-bold text-slate-800 tracking-tight flex items-center gap-2">
               <ShieldCheck className="w-4 h-4 text-blue-500" />
               监控端点
@@ -511,7 +523,7 @@ sudo systemctl restart containerd`;
             ) : monitors.length > 0 ? monitors.map((service) => {
               const meta = statusMeta(service.statusCode);
               return (
-                <div key={service.key} className="px-8 py-6 hover:bg-slate-50 transition-colors duration-200">
+                <div key={service.key} className="px-5 md:px-6 py-5 hover:bg-slate-50 transition-colors duration-200">
                   <div className="flex flex-col lg:flex-row lg:items-start justify-between gap-4">
                     <div className="min-w-0">
                       <div className="flex flex-wrap items-center gap-2">
@@ -523,7 +535,7 @@ sudo systemctl restart containerd`;
                       </div>
                       <code className="text-xs text-blue-600 font-mono break-all block mt-1">{service.url}</code>
                     </div>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-sm shrink-0">
+                    <div className="grid grid-cols-3 gap-2 text-sm shrink-0">
                       <div className="bg-slate-50 rounded-lg px-3 py-2 border border-slate-100">
                         <div className="text-[10px] text-slate-400 uppercase tracking-wider">Uptime</div>
                         <div className="font-bold text-slate-800 mt-1">{service.uptime}%</div>
@@ -532,7 +544,7 @@ sudo systemctl restart containerd`;
                         <div className="text-[10px] text-slate-400 uppercase tracking-wider">响应</div>
                         <div className="font-bold text-slate-800 mt-1">{service.responseTime ? `${service.responseTime} ms` : '-'}</div>
                       </div>
-                      <div className="bg-slate-50 rounded-lg px-3 py-2 border border-slate-100 col-span-2 sm:col-span-1">
+                      <div className="bg-slate-50 rounded-lg px-3 py-2 border border-slate-100">
                         <div className="text-[10px] text-slate-400 uppercase tracking-wider">状态码</div>
                         <div className="font-bold text-slate-800 mt-1">{service.statusCode}</div>
                       </div>
@@ -569,18 +581,6 @@ sudo systemctl restart containerd`;
             )}
           </div>
         </section>
-
-        <div className="bg-slate-900 rounded-2xl p-8 md:p-10 text-slate-300 shadow-xl border border-slate-800">
-          <h2 className="text-sm font-bold text-white uppercase tracking-widest mb-4 flex items-center gap-2">
-            <Terminal className="w-4 h-4" />
-            建议验证命令
-          </h2>
-          <pre className="bg-slate-950 px-5 py-5 rounded-xl border border-slate-800 font-mono text-sm leading-relaxed text-blue-300 overflow-x-auto whitespace-pre">{`curl -I https://cr.gua.cx/v2/
-curl -I https://dhub.gua.cx/v2/
-docker pull cr.gua.cx/docker.io/library/busybox:latest
-docker pull dhub.gua.cx/library/busybox:latest`}</pre>
-          <p className="text-xs text-slate-500 mt-3">说明：状态页直接读取 UptimeRobot Monitor-Specific API；镜像代理链路仍由 nginx 的 /v2/ 规则优先转发。</p>
-        </div>
       </main>
       )}
       </div>
