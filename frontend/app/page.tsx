@@ -263,7 +263,7 @@ sudo systemctl daemon-reload
 sudo systemctl restart containerd`;
 
   return (
-    <div className="w-full h-screen overflow-hidden flex flex-col bg-[#F8FAFC] text-slate-900">
+    <div className="w-full min-h-screen overflow-x-hidden flex flex-col bg-[#F8FAFC] text-slate-900">
       {/* Header */}
       <header className="h-16 shrink-0 border-b border-slate-200/70 bg-white/80 backdrop-blur-md px-4 md:px-8 lg:px-10 flex items-center justify-between gap-4 shadow-sm shadow-slate-200/30">
         <Link href="/" className="flex items-center gap-3 shrink-0" onClick={(event) => { event.preventDefault(); navigateTab('docs'); }}>
@@ -306,9 +306,9 @@ sudo systemctl restart containerd`;
       </header>
 
       {/* Main Content */}
-      <div key={activeTab} className="flex-1 w-full overflow-hidden animate-[fadeIn_260ms_ease-out]">
+      <div key={activeTab} className="flex-1 w-full animate-[fadeIn_260ms_ease-out]">
       {activeTab === 'docs' ? (
-      <main className="flex-1 overflow-y-auto w-full max-w-[1440px] mx-auto p-4 md:p-6 grid grid-cols-1 xl:grid-cols-12 gap-5 lg:gap-6">
+      <main className="w-full max-w-[1440px] mx-auto p-4 md:p-6 grid grid-cols-1 xl:grid-cols-12 gap-5 lg:gap-6">
         
         {/* Left: Hero & Converter */}
         <div className="xl:col-span-6 flex flex-col gap-5 lg:gap-6">
@@ -473,7 +473,7 @@ sudo systemctl restart containerd`;
         </div>
       </main>
       ) : (
-      <main className="h-full min-h-0 overflow-y-auto w-full max-w-[1440px] mx-auto p-4 md:p-5 grid grid-cols-1 xl:grid-cols-[340px_minmax(0,1fr)] gap-5">
+      <main className="w-full max-w-[1440px] mx-auto p-4 md:p-5 grid grid-cols-1 xl:grid-cols-[340px_minmax(0,1fr)] gap-5">
         <aside className="flex flex-col gap-4 xl:sticky xl:top-0 xl:self-start">
           <section className="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm transition-all duration-300 hover:shadow-md">
             <div className="flex items-start gap-3">
