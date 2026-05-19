@@ -1,6 +1,6 @@
 services:
   crproxy:
-    image: fimreal/crproxy:latest
+    image: cleverest/crproxy@sha256:5f16f699522e0598c57b6c4ba90be22f4743179e527dcc50c2651ac8ba110fe8
     container_name: crproxy
     restart: unless-stopped
     command:
@@ -15,7 +15,7 @@ services:
       - crproxy-cache:/var/lib/crproxy/cache
 
   web:
-    image: nginx:alpine
+    image: nginx@sha256:dc48b7a872a79fb541ba5081d320b11b549231bc63ba465a7495afaa7d2ebcb8
     container_name: mirror-hub-web
     restart: unless-stopped
     depends_on:
