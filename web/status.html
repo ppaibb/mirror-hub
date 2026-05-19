@@ -21,7 +21,8 @@
     <div id="status"></div>
 
     <script>
-      const MAX_DETAIL_LENGTH = 140;
+      const MAX_DETAIL_CHARS = 140;
+      const sanitizeText = (value) => String(value ?? '').replace(/\u0000/g, '');
       const checks = [
         {
           name: 'crproxy 健康检查',
@@ -50,9 +51,9 @@
             const text = await res.text();
             status = res.status;
             ok = check.validate(status, text);
-            detail = text.slice(0, MAX_DETAIL_LENGTH).replace(/\n/g, ' ');
+            detail = sanitizeText(text).slice(0, MAX_DETAIL_CHARS).replace(/\n/g, ' ');
           } catch (error) {
-            detail = String(error);
+            detail = sanitizeText(error);
           }
 
           const ms = Math.round(performance.now() - start);
