@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { Copy, Check, Box, Activity, ShieldCheck, Terminal, RefreshCw, AlertTriangle, Clock3, Wifi, FileText } from 'lucide-react';
+import { Copy, Check, Box, Activity, ShieldCheck, Terminal, RefreshCw, AlertTriangle, Clock3, Wifi, FileText, Github } from 'lucide-react';
 
 const UPTIME_ROBOT_API_KEYS = (process.env.NEXT_PUBLIC_UPTIME_ROBOT_API_KEYS || '')
   .split(',')
@@ -272,7 +272,7 @@ sudo systemctl restart containerd`;
           </div>
           <span className="font-bold text-lg md:text-xl tracking-tight text-slate-800">GUA Hub 镜像加速节点</span>
         </Link>
-        <nav className="flex items-center gap-5 md:gap-7 text-sm font-semibold text-slate-500">
+        <nav className="flex items-center gap-4 md:gap-7 text-sm font-semibold text-slate-500">
           {[
             { key: 'docs' as const, label: '使用文档', href: '/', icon: FileText },
             { key: 'status' as const, label: '服务状态', href: '/status', icon: Activity },
@@ -292,6 +292,16 @@ sudo systemctl restart containerd`;
               </Link>
             );
           })}
+          <a
+            href="https://github.com/ppaibb/mirror-hub"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="GitHub mirror-hub"
+            className="inline-flex items-center gap-1.5 py-2 text-slate-500 transition-colors duration-200 hover:text-slate-950"
+          >
+            <Github className="w-4 h-4" />
+            <span className="hidden sm:inline">GitHub</span>
+          </a>
         </nav>
       </header>
 
