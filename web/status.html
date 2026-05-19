@@ -21,6 +21,7 @@
     <div id="status"></div>
 
     <script>
+      const MAX_DETAIL_LENGTH = 140;
       const checks = [
         {
           name: 'crproxy 健康检查',
@@ -49,7 +50,7 @@
             const text = await res.text();
             status = res.status;
             ok = check.validate(status, text);
-            detail = text.slice(0, 140).replace(/\n/g, ' ');
+            detail = text.slice(0, MAX_DETAIL_LENGTH).replace(/\n/g, ' ');
           } catch (error) {
             detail = String(error);
           }
